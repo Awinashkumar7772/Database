@@ -13,7 +13,7 @@ order by count asc;
 select gradecode, max(basic), min(basic) from grade
 group by gradecode;
 
-//30
+//Q30
 select s.empname as supervisor, e.empname as employee
 from emp e join emp s on 
 s.empcode = e.supcode
@@ -69,7 +69,7 @@ having total < 99700;
 
 
 //Q42
-SELECT e.empname, e.deptcode, e.basicpay
+SELECT e.empname, e.dept, e.basicpay
 FROM emp e
 WHERE e.basicpay = (
     SELECT MAX(basicpay)
@@ -77,7 +77,72 @@ WHERE e.basicpay = (
     WHERE deptcode = e.deptcode
 );
 
+//Q43
+select e.empname, e.basicpay
+from emp e where basicpay= 
+all(select max(basicpay) from emp where basicpay <
+all(select max(basicpay) from emp));
 
+
+//Q44
+select e.empname, e.basicpay
+from emp e where basicpay= 
+all(select max(basicpay) from emp where basicpay <
+all(select max(basicpay) from emp where basicpay < 
+all(select max(basicpay) from emp where basicpay <
+all(select max(basicpay) from emp where basicpay <
+all(select max(basicpay) from emp)))));
+
+
+SELECT empname, basicpay
+FROM (
+    SELECT empname, basicpay,
+	DENSE_RANK() OVER (ORDER BY basicpay DESC) AS rnk
+    FROM emp
+) ranked
+WHERE rnk = 5;
+
+//Q45
+select e.basicpay, d.deptname from emp e join dept d
+on e.deptcode = d.deptcode
+where basicpay = (select max(basicpay) from emp
+where sex = 'F');
+
+//Q46
+select e.empname, e.basicpay from emp e join emp s
+on e.empcode = s.empcode
+where e.sex = 'M'
+group by e.empname, e.basicpay
+having e.basicpay > any(select basicpay from emp where sex = 'F');
+
+//Q46
+SELECT empname, basicpay
+FROM emp
+WHERE sex = 'M'
+  AND basicpay > ANY (
+      SELECT basicpay
+      FROM emp
+      WHERE sex = 'F'
+  );
+
+
+//Q47
+select e.deptcode, avg(s.basic + s.allow - s.deduct) as average_sal from emp e join salary s
+on e.empcode = s.empcode
+group by e.deptcode
+having average_sal > (select avg(basic + allow - deduct) from salary) ;
+
+//Q48
+SELECT e.empname, e.deptcode, SUM(s.basic + s.allow - s.deduct) AS total_salary
+FROM emp e
+JOIN salary s ON e.empcode = s.empcode
+GROUP BY e.empcode, e.empname, e.deptcode
+HAVING SUM(s.basic + s.allow - s.deduct) < (
+    SELECT AVG(s.basic + s.allow - s.deduct)
+    FROM emp e2
+    JOIN salary s ON e2.empcode = s.empcode
+    WHERE e2.deptcode = 'STOR'
+);
 
 
 
@@ -86,8 +151,9 @@ WHERE e.basicpay = (
 select avg(s.basic+ s.allow - s.deduct) as average from emp e 
 join salary s on e.empcode = s.empcode;
 
-select * from salary;
 
 select * from salary;
 
 select * from emp;
+select * from dept;
+
