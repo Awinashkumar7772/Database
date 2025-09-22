@@ -57,7 +57,11 @@ select*from person_info;
 delimiter //
 create trigger after_delete after delete on emp
 for each row 
-update person_info set 
+update average_age1 set average = (select aveg(timestampdiff(year,birthdate,curdate())) from emp); //
+delimiter ;
+select*from emp;
+select* from average_age1;
+delete from emp where empcode = '7192';
 
 
 
